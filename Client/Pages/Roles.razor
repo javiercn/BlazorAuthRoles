@@ -1,0 +1,57 @@
+﻿@page "/roles"
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize]
+@inject HttpClient HttpClient
+
+<h3>Roles</h3>
+@if (_user != null)
+{
+    <ul>
+        @foreach (var role in _user.Claims.Where(c => c.Type == "role"))
+        {
+            <li>@role.Value</li>
+        }
+    </ul>
+    <EditForm Model="_newRole" OnValidSubmit="AddRole">
+        <p class="input-group">
+            <label>
+                New role
+                <InputText @bind-Value="_newRole.NewRole" />
+            </label>
+            <ValidationMessage For="() => _newRole.NewRole" />
+        </p>
+        <p>
+            <input class="btn btn-primary" type="submit" value="Add new role" />
+        </p>
+    </EditForm>
+}
+else
+{
+    <p>User not available</p>
+}
+@code
+{
+    ClaimsPrincipal _user;
+    NewRoleForm _newRole = new NewRoleForm();
+
+    [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        _user = (await AuthenticationState).User;
+        await base.OnInitializedAsync();
+    }
+
+    public async Task AddRole()
+    {
+        var response = await HttpClient.PostAsJsonAsync("/User/AddRole", _newRole);
+        response.EnsureSuccessStatusCode();
+    }
+
+    private class NewRoleForm
+    {
+        [System.ComponentModel.DataAnnotations.Required]
+        public string NewRole { get; set; }
+    }
+}
