@@ -25,6 +25,10 @@
             <input class="btn btn-primary" type="submit" value="Add new role" />
         </p>
     </EditForm>
+    if (_successMessage != null)
+    {
+        <p class="alert alert-success">@_successMessage<button type="button" class="close" @onclick="Dismiss"><span aria-hidden="true">&times;</span></button></p>
+    }
 }
 else
 {
@@ -34,6 +38,7 @@ else
 {
     ClaimsPrincipal _user;
     NewRoleForm _newRole = new NewRoleForm();
+    string _successMessage;
 
     [CascadingParameter] Task<AuthenticationState> AuthenticationState { get; set; }
 
@@ -47,7 +52,11 @@ else
     {
         var response = await HttpClient.PostAsJsonAsync("/User/AddRole", _newRole);
         response.EnsureSuccessStatusCode();
+        _successMessage = $"Role '{_newRole.NewRole}' successfully added. Logout and login to see the role reflected";
+        _newRole = new NewRoleForm();
     }
+
+    public void Dismiss() => _successMessage = null;
 
     private class NewRoleForm
     {

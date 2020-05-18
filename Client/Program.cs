@@ -20,8 +20,8 @@ namespace BlazorApp17.Client
             // Supply HttpClient instances that include access tokens when making requests to the server project
             builder.Services.AddTransient(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("BlazorApp17.ServerAPI"));
 
-            builder.Services.AddApiAuthorization<RemoteAuthenticationState,RolesAccount>()
-                .AddAccountClaimsPrincipalFactory<RemoteAuthenticationState,RolesAccount, RolesClaimsPrincipalFactory>();
+            builder.Services.AddApiAuthorization()
+                .AddAccountClaimsPrincipalFactory<RolesClaimsPrincipalFactory>();
 
             await builder.Build().RunAsync();
         }
